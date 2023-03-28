@@ -1,4 +1,7 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Rar;
+using SharpCompress.Common;
 using System.IO.Compression;
 using System.Net;
 using System.Runtime;
@@ -165,14 +168,15 @@ namespace CheckPrepper
             {
                 try
                 {
+                    var destDir = Path.GetDirectoryName(_file);
+                    var destFile = Path.GetFileNameWithoutExtension(_file).Replace(' ', '_');
+                    var dest = $"{destDir}\\{destFile}_unzip";
+
                     switch (Path.GetExtension(_file))
                     {
                         case ".zip":
-                            var destDir = Path.GetDirectoryName(_file);
-                            var destFile = Path.GetFileNameWithoutExtension(_file);
                             if (destDir != null && destFile != null)
                             {
-                                var dest = $"{destDir}\\{destFile}_unzip";
                                 ZipFile.ExtractToDirectory(_file, dest);
                                 _currentLog?.Add($"-> {_file} Unzipped!");
                                 Console.WriteLine($"-> {_file} Unzipped!");
@@ -180,8 +184,22 @@ namespace CheckPrepper
                             }
                             break;
                         case ".rar":
-                            // todo implement
-                            Console.WriteLine($"-> {_file} is an RAR archive!");
+                            if (destDir != null && destFile != null)
+                            {
+                                Directory.CreateDirectory(dest);
+                                using (var archive = RarArchive.Open(_file))
+                                {
+                                    foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                                    {
+                                        entry.WriteToDirectory(dest, new ExtractionOptions()
+                                        {
+                                            ExtractFullPath = true,
+                                            Overwrite = true
+                                        });
+                                    }
+                                }
+                                return true;
+                            }
                             break;
                         case ".gz":
                             // todo implement
