@@ -108,7 +108,7 @@ namespace CheckPrepper
         private static bool TryDeleteDirectoryIfNeeded(string _currentPath, List<string>? _currentLog = null)
         {
             var dirInfo = new DirectoryInfo(_currentPath);
-            if (dirInfo.Name.Equals("obj") || dirInfo.Name.Equals("bin"))
+            if (dirInfo.Name.Equals("obj") || dirInfo.Name.Equals("bin") || dirInfo.Name.Equals("__MACOSX"))
             {
                 if (_currentLog != null)
                 {
