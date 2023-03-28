@@ -166,18 +166,18 @@ namespace CheckPrepper
         {
             if (_file != null)
             {
+                var destDir = Path.GetDirectoryName(_file);
+                var destFile = Path.GetFileNameWithoutExtension(_file).Replace(' ', '_');
+                var dest = $"{destDir}\\{destFile}_unzip";
+
                 try
                 {
-                    var destDir = Path.GetDirectoryName(_file);
-                    var destFile = Path.GetFileNameWithoutExtension(_file).Replace(' ', '_');
-                    var dest = $"{destDir}\\{destFile}_unzip";
-
                     switch (Path.GetExtension(_file))
                     {
                         case ".zip":
                             if (destDir != null && destFile != null)
                             {
-                                ZipFile.ExtractToDirectory(_file, dest);
+                                ZipFile.ExtractToDirectory(_file, dest, true);
                                 _currentLog?.Add($"-> {_file} Unzipped!");
                                 Console.WriteLine($"-> {_file} Unzipped!");
                                 return true;
@@ -209,6 +209,8 @@ namespace CheckPrepper
                 }
                 catch (Exception ex)
                 {
+                    // delete dest if unzip failed
+                    Directory.Delete(dest, true);
                     _currentLog?.Add($"-> {_file} not unzipped: {ex.Message}");
                     Console.WriteLine($"-> {_file} not unzipped: {ex.Message}");
                 }
