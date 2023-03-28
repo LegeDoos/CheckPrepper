@@ -187,16 +187,14 @@ namespace CheckPrepper
                             if (destDir != null && destFile != null)
                             {
                                 Directory.CreateDirectory(dest);
-                                using (var archive = RarArchive.Open(_file))
+                                using var archive = RarArchive.Open(_file);
+                                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
                                 {
-                                    foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                                    entry.WriteToDirectory(dest, new ExtractionOptions()
                                     {
-                                        entry.WriteToDirectory(dest, new ExtractionOptions()
-                                        {
-                                            ExtractFullPath = true,
-                                            Overwrite = true
-                                        });
-                                    }
+                                        ExtractFullPath = true,
+                                        Overwrite = true
+                                    });
                                 }
                                 return true;
                             }
