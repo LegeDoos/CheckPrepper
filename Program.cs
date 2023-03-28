@@ -23,12 +23,12 @@ namespace CheckPrepper
         /// </summary>
         /// <param name="_path">The starting point</param>
         /// <param name="_inStudentFolder">Marks if this is a folder containing a students work</param>
-        private static void RecurseFolders(string _path, bool _inStudentFolder = false, List<string> _currentLog = null)
+        private static void RecurseFolders(string _path, bool _inStudentFolder = false, List<string>? _currentLog = null)
         {
             bool inStudentFolder = _inStudentFolder;
-            bool studentRootFolder = false;
-            string currentPath = _path;
-            if (!Directory.Exists(currentPath))
+            bool studentRootFolder;
+            string? currentPath = _path;
+            if (!Directory.Exists(currentPath) || currentPath == null)
             {
                 Console.WriteLine($"{currentPath} doesn't exist!");
             }
@@ -42,8 +42,10 @@ namespace CheckPrepper
                 if (studentRootFolder)
                 {
                     // start new log
-                    _currentLog = new List<string>();
-                    _currentLog.Add($"Timestamp: {DateTime.Now}");
+                    _currentLog = new List<string>
+                    {
+                        $"Timestamp: {DateTime.Now}"
+                    };
                     if (!File.Exists(logFileName))
                     {
                         // first time in this student's folder, place marker
@@ -54,9 +56,10 @@ namespace CheckPrepper
                     Console.WriteLine($"Processing student: {currentPath}");
                     // rename folder
                     currentPath = RenameFolder(currentPath, _currentLog);
+                    logFileName = $"{currentPath}\\_isStudent.txt";
                 }
 
-                if (inStudentFolder)
+                if (inStudentFolder && currentPath != null)
                 {
                     // delete obj / bin and stop processing
                     if (!TryDeleteDirectoryIfNeeded(currentPath, _currentLog))
@@ -121,9 +124,32 @@ namespace CheckPrepper
         /// <param name="path">The original path</param>
         /// <param name="_currentLog">The current log to add stuff to</param>
         /// <returns>The new path</returns>
-        private static string RenameFolder(string path, List<string>? _currentLog = null)
+        private static string? RenameFolder(string? path, List<string>? _currentLog = null)
         {
-            
+            // voornaam achternaam_3122769_assignsubmission_file_
+            if (path != null)
+            {
+                var dI = new DirectoryInfo(path);
+                if (dI != null)
+                {
+                    var dirName = dI.Name;
+                    var parts = dirName.Split('_');
+                    if (parts.Length > 0 && !dirName.Equals(parts[0]))
+                    {
+                        try
+                        {
+                            var dest = $"{dI.Parent}\\{parts[0]}";
+                            Directory.Move(path, dest);
+                            return dest;
+                        }
+                        catch (Exception ex)
+                        {
+                            _currentLog?.Add($"Error renaming folder: {ex.Message}");
+                            Console.WriteLine($"Error renaming folder");
+                        } 
+                    }
+                }
+            }
             return path;            
         }
 
@@ -148,8 +174,7 @@ namespace CheckPrepper
                             {
                                 var dest = $"{destDir}\\{destFile}_unzip";
                                 ZipFile.ExtractToDirectory(_file, dest);
-                                if (_currentLog != null)
-                                    _currentLog.Add($"-> {_file} Unzipped!");
+                                _currentLog?.Add($"-> {_file} Unzipped!");
                                 Console.WriteLine($"-> {_file} Unzipped!");
                                 return true;
                             }
@@ -168,8 +193,7 @@ namespace CheckPrepper
                 }
                 catch (Exception ex)
                 {
-                    if (_currentLog != null)
-                        _currentLog.Add($"-> {_file} not unzipped: {ex.Message}");
+                    _currentLog?.Add($"-> {_file} not unzipped: {ex.Message}");
                     Console.WriteLine($"-> {_file} not unzipped: {ex.Message}");
                 }
             }
