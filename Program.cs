@@ -14,9 +14,10 @@ namespace CheckPrepper
         static void Main()
         {
             Console.WriteLine("Checkprepper!");
-            
+
             // give the base folder containing unzipped Moodle archives
             string baseFolder = @"D:\Correctiewerk\";
+            //string baseFolder = @"D:\users\cilissenr\Onedrive - ZuydHogeschool\Documents\Werk_Zuyd\A2D1B2C2 - Web development";
             // start processing
             RecurseFolders(baseFolder);
         }
@@ -115,7 +116,19 @@ namespace CheckPrepper
                     _currentLog.Add($"-> Delete {_currentPath} because it is a temp folder.");
                     Console.WriteLine($"-> Delete {_currentPath} because it is a temp folder.");
                 }
-                Directory.Delete(_currentPath, true);
+                try
+                {
+                    Directory.Delete(_currentPath, true);
+                }
+                catch (Exception ex)
+                {
+                    if (_currentLog != null)
+                    {
+                        _currentLog.Add($"-> Delete {_currentPath} failed with exception: {ex.Message}.");
+                        Console.WriteLine($"-> Delete {_currentPath} failed with exception: {ex.Message}.");
+                    }
+                    return false;
+                }
                 return true;
             }
             return false;
@@ -210,7 +223,19 @@ namespace CheckPrepper
                 catch (Exception ex)
                 {
                     // delete dest if unzip failed
-                    Directory.Delete(dest, true);
+                    try
+                    {
+                        Directory.Delete(dest, true);
+                     
+                    }
+                    catch (Exception exsub)
+                    {
+                        if (_currentLog != null)
+                        {
+                            _currentLog.Add($"-> Delete {dest} failed with exception: {exsub.Message}.");
+                            Console.WriteLine($"-> Delete {dest} failed with exception: {exsub.Message}.");
+                        }
+                    }
                     _currentLog?.Add($"-> {_file} not unzipped: {ex.Message}");
                     Console.WriteLine($"-> {_file} not unzipped: {ex.Message}");
                 }
