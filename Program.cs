@@ -143,6 +143,8 @@ namespace CheckPrepper
         private static string? RenameFolder(string? path, List<string>? _currentLog = null)
         {
             // voornaam achternaam_3122769_assignsubmission_file_
+            // Kai Veth, de_3287313_assignsubmission_file_
+
             if (path != null)
             {
                 var dI = new DirectoryInfo(path);
@@ -150,19 +152,50 @@ namespace CheckPrepper
                 {
                     var dirName = dI.Name;
                     var parts = dirName.Split('_');
-                    if (parts.Length > 0 && !dirName.Equals(parts[0]))
+
+                    if (parts.Length > 0)
                     {
-                        try
+                        // swap name so lastname is first
+
+                        var firstName = string.Empty;
+                        var lastName = string.Empty;
+                        var inFix = string.Empty;
+                        string studentName = studentName = parts[0];
+
+                        // zoeken naar tussenvoegsel op basis van komma
+                        var nameParts = studentName.Split(',');
+
+                        if (nameParts.Length == 2)
                         {
-                            var dest = $"{dI.Parent}\\{parts[0]}";
-                            Directory.Move(path, dest);
-                            return dest;
+                            // er is een tussenvoegsel
+                            inFix = $"{nameParts[1]}";
+                            studentName = nameParts[0];
                         }
-                        catch (Exception ex)
+
+                        // zoeken naar achternaam
+                        nameParts = studentName.Split(' ');
+                        lastName = nameParts[nameParts.Length - 1];
+                        for (int i = 0; i < nameParts.Length - 1; i++)
                         {
-                            _currentLog?.Add($"Error renaming folder: {ex.Message}");
-                            Console.WriteLine($"Error renaming folder");
-                        } 
+                            firstName += $" {nameParts[i]}";
+                        }
+                        //Montfort, Aukje Reina van
+                        studentName = $"{lastName},{firstName}{inFix}";
+
+                        if (!dirName.Equals(studentName))
+                        {
+                            try
+                            {
+                                var dest = $"{dI.Parent}\\{studentName}";
+                                Directory.Move(path, dest);
+                                return dest;
+                            }
+                            catch (Exception ex)
+                            {
+                                _currentLog?.Add($"Error renaming folder: {ex.Message}");
+                                Console.WriteLine($"Error renaming folder");
+                            }
+                        }
                     }
                 }
             }
