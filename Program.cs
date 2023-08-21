@@ -39,7 +39,7 @@ namespace CheckPrepper
             else
             {
                 // check student folder            
-                inStudentFolder = inStudentFolder || currentPath.Contains("assignsubmission_file_") || File.Exists($"{currentPath}\\_isStudent.txt") ;
+                inStudentFolder = inStudentFolder || currentPath.Contains("assignsubmission_file") || File.Exists($"{currentPath}\\_isStudent.txt") ;
                 studentRootFolder = inStudentFolder && !_inStudentFolder;
                 var logFileName = $"{currentPath}\\_isStudent.txt";
 
