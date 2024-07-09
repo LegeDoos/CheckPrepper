@@ -46,10 +46,10 @@ namespace CheckPrepper
                 if (studentRootFolder)
                 {
                     // start new log
-                    _currentLog = new List<string>
-                    {
+                    _currentLog =
+                    [
                         $"Timestamp: {DateTime.Now}"
-                    };
+                    ];
                     if (!File.Exists(logFileName))
                     {
                         // first time in this student's folder, place marker
@@ -157,10 +157,10 @@ namespace CheckPrepper
                     {
                         // swap name so lastname is first
 
-                        var firstName = string.Empty;
-                        var lastName = string.Empty;
+                        string firstName = string.Empty;
+                        string lastName;
                         var inFix = string.Empty;
-                        string studentName = studentName = parts[0];
+                        string studentName = parts[0];
 
                         // zoeken naar tussenvoegsel op basis van komma
                         var nameParts = studentName.Split(',');
