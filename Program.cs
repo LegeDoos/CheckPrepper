@@ -233,7 +233,7 @@ namespace CheckPrepper
                             if (destDir != null && destFile != null)
                             {
                                 Directory.CreateDirectory(dest);
-                                using var archive = RarArchive.Open(_file);
+                                using var archive = RarArchive.OpenArchive(_file);
                                 foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
                                 {
                                     entry.WriteToDirectory(dest, new ExtractionOptions()
