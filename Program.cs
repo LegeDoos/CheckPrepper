@@ -16,7 +16,7 @@ namespace CheckPrepper
             Console.WriteLine("Checkprepper!");
 
             // give the base folder containing unzipped Moodle archives
-            string baseFolder = @"D:\Correctiewerk\";
+            string baseFolder = @"C:\RCData\Correctiewerk";
             //string baseFolder = @"D:\users\cilissenr\Onedrive - ZuydHogeschool\Documents\Werk_Zuyd\A2D1B2C2 - Web development";
             // start processing
             RecurseFolders(baseFolder);
